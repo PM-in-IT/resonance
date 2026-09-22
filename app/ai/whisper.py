@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Any
 
-from app.ai.contracts import TranscriptSentence
+from app.ai.contracts import TranscriptChunk
 from app.core.config import settings
 
 
@@ -18,7 +18,7 @@ class WhisperTranscriber:
 
         self._model = WhisperModel(model_name, device=device, compute_type=compute_type)
 
-    def transcribe(self, audio_path: Path) -> list[TranscriptSentence]:
+    def transcribe(self, audio_path: Path) -> list[TranscriptChunk]:
         segments, _ = self._model.transcribe(
             str(audio_path),
             vad_filter=True,
@@ -27,8 +27,8 @@ class WhisperTranscriber:
         return [self._to_sentence(segment) for segment in segments if segment.text.strip()]
 
     @staticmethod
-    def _to_sentence(segment: Any) -> TranscriptSentence:
-        return TranscriptSentence(
+    def _to_sentence(segment: Any) -> TranscriptChunk:
+        return TranscriptChunk(
             start_ms=round(float(segment.start) * 1000),
             end_ms=round(float(segment.end) * 1000),
             text=segment.text.strip(),
