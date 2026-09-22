@@ -17,6 +17,9 @@ class Settings(BaseSettings):
     max_upload_bytes: int = 100 * 1024 * 1024
     max_media_duration_seconds: int = 600
     embedding_dimension: int = 0
+    whisper_model: str = "small"
+    whisper_device: str = "cpu"
+    whisper_compute_type: str = "int8"
 
 
 @lru_cache

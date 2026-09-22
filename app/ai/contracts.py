@@ -19,6 +19,25 @@ class GroundingChunk:
     text: str
 
 
+@dataclass(frozen=True, slots=True)
+class TranscriptChunk:
+    start_ms: int
+    end_ms: int
+    text: str
+
+
+class Transcriber(Protocol):
+    def transcribe(self, audio_path: Path) -> Sequence[TranscriptChunk]:
+        """Return timestamped sentence-level transcript segments."""
+        ...
+        
+
+class Chunker(Protocol):
+    def chunk(self, transcript: Sequence[TranscriptChunk]) -> Sequence[GroundingChunk]:
+        """Return a sequence of chunks suitable for embedding and indexing."""
+        ...
+
+
 class AudioIndexer(Protocol):
     def index(self, audio_path: Path) -> Sequence[IndexedChunk]:
         """Transcribe, timestamp, chunk and embed a media file."""
