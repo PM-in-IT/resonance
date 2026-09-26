@@ -1,9 +1,9 @@
 from app.ai.chunking import TranscriptChunker
 from app.ai.contracts import (
     AudioIndexer,
+    Chunker,
     GroundedSummarizer,
     QueryEmbedder,
-    Chunker,
     Transcriber,
 )
 from app.ai.stubs import StubAudioIndexer, StubGroundedSummarizer, StubQueryEmbedder
