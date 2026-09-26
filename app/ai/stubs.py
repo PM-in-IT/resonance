@@ -15,5 +15,12 @@ class StubQueryEmbedder:
 
 
 class StubGroundedSummarizer:
-    def summarize(self, question: str, chunks: Sequence[GroundingChunk]) -> str:
-        raise NotImplementedError("Wire the AI/ML GroundedSummarizer implementation in app.ai.factory")
+    def summarize(
+        self,
+        question: str,
+        chunks: Sequence[GroundingChunk],
+    ) -> str:
+        raise NotImplementedError(
+            "Wire the AI/ML GroundedSummarizer implementation "
+            "in app.ai.factory"
+        )

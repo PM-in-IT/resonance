@@ -20,7 +20,11 @@ class FakeWhisperModel:
         self.device = device
         self.compute_type = compute_type
 
-    def transcribe(self, audio_path: str, **kwargs: object) -> tuple[list[FakeSegment], dict[str, object]]:
+    def transcribe(
+            self,
+            audio_path: str,
+            **kwargs: object,
+    ) -> tuple[list[FakeSegment], dict[str, object]]:
         assert audio_path.endswith("example.wav")
         assert kwargs["vad_filter"] is True
         assert kwargs["word_timestamps"] is False
@@ -32,7 +36,13 @@ class FakeWhisperModel:
 
 
 def test_whisper_transcriber_converts_segments_to_transcript_chunks(monkeypatch) -> None:
-    monkeypatch.setitem(sys.modules, "faster_whisper", types.SimpleNamespace(WhisperModel=FakeWhisperModel))
+    monkeypatch.setitem(
+        sys.modules,
+        "faster_whisper",
+        types.SimpleNamespace(
+            WhisperModel=FakeWhisperModel,
+        ),
+    )
 
     transcriber = WhisperTranscriber(model_name="tiny", device="cpu", compute_type="int8")
     chunks = transcriber.transcribe(Path("/tmp/example.wav"))
@@ -44,7 +54,13 @@ def test_whisper_transcriber_converts_segments_to_transcript_chunks(monkeypatch)
 
 
 def test_factory_returns_whisper_transcriber(monkeypatch) -> None:
-    monkeypatch.setitem(sys.modules, "faster_whisper", types.SimpleNamespace(WhisperModel=FakeWhisperModel))
+    monkeypatch.setitem(
+        sys.modules,
+        "faster_whisper",
+        types.SimpleNamespace(
+            WhisperModel=FakeWhisperModel,
+        ),
+    )
 
     transcriber = get_transcriber()
 

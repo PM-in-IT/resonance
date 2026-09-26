@@ -19,3 +19,9 @@ lint:
 format:
 	ruff format .
 	ruff check --fix .
+
+worker:
+	.venv/bin/rq worker \
+		-w rq.worker.SpawnWorker \
+		media \
+		--url redis://localhost:6379/0

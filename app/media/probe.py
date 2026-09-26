@@ -1,6 +1,7 @@
-import json
-import subprocess
+import math
 from pathlib import Path
+
+import av
 
 
 class InvalidMediaError(ValueError):
@@ -8,24 +9,27 @@ class InvalidMediaError(ValueError):
 
 
 def probe_duration_ms(path: Path) -> int:
-    result = subprocess.run(
-        [
-            "ffprobe", "-v", "error",
-            "-show_entries", "format=duration",
-            "-of", "json",
-            str(path),
-        ],
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    if result.returncode != 0:
-        raise InvalidMediaError("Uploaded file is not a readable media file")
-
-    payload = json.loads(result.stdout)
     try:
-        seconds = float(payload["format"]["duration"])
-    except (KeyError, TypeError, ValueError) as exc:
-        raise InvalidMediaError("Could not determine media duration") from exc
+        with av.open(str(path)) as container:
+            duration = container.duration
+
+            if duration is None:
+                raise InvalidMediaError(
+                    "Could not determine media duration"
+                )
+
+            seconds = duration / av.time_base
+
+    except InvalidMediaError:
+        raise
+    except Exception as exc:
+        raise InvalidMediaError(
+            "Uploaded file is not a readable media file"
+        ) from exc
+
+    if not math.isfinite(seconds) or seconds <= 0:
+        raise InvalidMediaError(
+            "Media duration must be positive"
+        )
 
     return round(seconds * 1000)
