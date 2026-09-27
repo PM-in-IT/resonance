@@ -39,6 +39,12 @@ class Chunker(Protocol):
         ...
 
 
+class DocumentEmbedder(Protocol):
+    def embed_documents(self, texts: Sequence[str]) -> list[list[float]]:
+        """Encode transcript text for vector storage."""
+        ...
+
+
 class AudioIndexer(Protocol):
     def index(self, audio_path: Path) -> Sequence[IndexedChunk]:
         """Transcribe, timestamp, chunk and embed a media file."""
