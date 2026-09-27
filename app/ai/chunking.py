@@ -1,6 +1,6 @@
 from collections.abc import Sequence
 
-from app.ai.contracts import GroundingChunk, TranscriptChunk, Chunker
+from app.ai.contracts import Chunker, GroundingChunk, TranscriptChunk
 
 
 class TranscriptChunker(Chunker):

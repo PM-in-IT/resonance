@@ -14,7 +14,7 @@ class WhisperTranscriber:
         device: str = settings.whisper_device,
         compute_type: str = settings.whisper_compute_type,
     ) -> None:
-        from faster_whisper import WhisperModel 
+        from faster_whisper import WhisperModel
 
         self._model = WhisperModel(model_name, device=device, compute_type=compute_type)
 

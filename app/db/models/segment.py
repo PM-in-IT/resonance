@@ -10,18 +10,57 @@ from app.db.base_class import Base
 
 class TranscriptSegment(Base):
     __tablename__ = "transcript_segments"
+
     __table_args__ = (
-        UniqueConstraint("audio_id", "ordinal", name="uq_segment_audio_ordinal"),
+        UniqueConstraint(
+            "audio_id",
+            "ordinal",
+            name="uq_segment_audio_ordinal",
+        ),
     )
 
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4,
+    )
+
     audio_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("audio_assets.id", ondelete="CASCADE"), index=True
+        UUID(as_uuid=True),
+        ForeignKey(
+            "audio_assets.id",
+            ondelete="CASCADE",
+        ),
+        nullable=False,
+        index=True,
     )
-    ordinal: Mapped[int] = mapped_column(Integer)
-    start_ms: Mapped[int] = mapped_column(BigInteger)
-    end_ms: Mapped[int] = mapped_column(BigInteger)
-    text: Mapped[str] = mapped_column(Text)
-    embedding: Mapped[list[float]] = mapped_column(VECTOR())
 
-    audio = relationship("AudioAsset", back_populates="segments")
+    ordinal: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+    )
+
+    start_ms: Mapped[int] = mapped_column(
+        BigInteger,
+        nullable=False,
+    )
+
+    end_ms: Mapped[int] = mapped_column(
+        BigInteger,
+        nullable=False,
+    )
+
+    text: Mapped[str] = mapped_column(
+        Text,
+        nullable=False,
+    )
+
+    embedding: Mapped[list[float] | None] = mapped_column(
+        VECTOR(),
+        nullable=True,
+    )
+
+    audio = relationship(
+        "AudioAsset",
+        back_populates="segments",
+    )

@@ -1,5 +1,5 @@
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Sequence
 
 from app.ai.contracts import GroundingChunk, IndexedChunk
 
@@ -15,5 +15,12 @@ class StubQueryEmbedder:
 
 
 class StubGroundedSummarizer:
-    def summarize(self, question: str, chunks: Sequence[GroundingChunk]) -> str:
-        raise NotImplementedError("Wire the AI/ML GroundedSummarizer implementation in app.ai.factory")
+    def summarize(
+        self,
+        question: str,
+        chunks: Sequence[GroundingChunk],
+    ) -> str:
+        raise NotImplementedError(
+            "Wire the AI/ML GroundedSummarizer implementation "
+            "in app.ai.factory"
+        )
