@@ -3,7 +3,7 @@ from collections.abc import Sequence
 from uuid import UUID
 
 from app.ai.contracts import GroundingChunk
-from app.ai.factory import get_chunker, get_transcriber
+from app.ai.factory import get_chunker, get_document_embedder, get_transcriber
 from app.core.enums import AudioStatus
 from app.db.models.segment import TranscriptSegment
 from app.db.session import SessionLocal
@@ -78,6 +78,15 @@ def process_audio(audio_id_raw: str) -> None:
 
         _validate_chunks(chunks)
 
+        embeddings = get_document_embedder().embed_documents(
+            [chunk.text for chunk in chunks]
+        )
+
+        if len(embeddings) != len(chunks) or any(not embedding for embedding in embeddings):
+            raise InvalidChunkError(
+                "Embedding model returned an invalid number of vectors"
+            )
+
         rows = [
             TranscriptSegment(
                 audio_id=audio_id,
@@ -85,7 +94,7 @@ def process_audio(audio_id_raw: str) -> None:
                 start_ms=chunk.start_ms,
                 end_ms=chunk.end_ms,
                 text=chunk.text,
-                embedding=None,
+                embedding=embeddings[ordinal],
             )
             for ordinal, chunk in enumerate(chunks)
         ]

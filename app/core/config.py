@@ -30,6 +30,8 @@ class Settings(BaseSettings):
     max_media_duration_seconds: int = 600
 
     embedding_dimension: int = 0
+    sentence_transformer_model: str = "sentence-transformers/all-MiniLM-L6-v2"
+    sentence_transformer_device: str = "cpu"
 
     whisper_model: str = "small"
     whisper_device: str = "cpu"

@@ -17,6 +17,7 @@ dependencies = [
     "python-multipart>=0.0.12,<1",
     "redis>=5,<7",
     "rq>=2,<4",
+    "sentence-transformers>=3,<6",
     "sqlalchemy>=2.0,<3",
     "uvicorn[standard]>=0.30,<1",
 ]
