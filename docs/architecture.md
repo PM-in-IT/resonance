@@ -46,14 +46,10 @@ The worker does not make this a microservice: there is one codebase, one domain 
 
 ## Stable integration contracts
 
-`AudioIndexer.index(path) -> Sequence[IndexedChunk]`
-
-Each chunk:
-- `ordinal`
-- `start_ms`
-- `end_ms`
-- `text`
-- `embedding`
+The worker composes these AI contracts directly:
+- `Transcriber.transcribe(path) -> Sequence[TranscriptChunk]`
+- `Chunker.chunk(transcript) -> Sequence[GroundingChunk]`
+- `DocumentEmbedder.embed_documents(texts) -> list[list[float]]`
 
 `QueryEmbedder.embed_query(question) -> list[float]`
 
@@ -76,7 +72,9 @@ Client
 
 Worker
  -> status=processing
- -> AudioIndexer.index(media)
+ -> Transcriber.transcribe(media)
+ -> Chunker.chunk(transcript)
+ -> DocumentEmbedder.embed_documents(chunks)
  -> persist timestamped chunks + embeddings
  -> status=ready
 ```

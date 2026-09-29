@@ -31,7 +31,7 @@ Create `audio_assets`, `transcript_segments`, `query_records`; enable pgvector.
 - status/audio-id lookup indexes exist.
 
 ## RES-4 Backend ↔ AI contracts — Backend + AI — 3 SP
-Freeze `AudioIndexer`, `QueryEmbedder`, `GroundedSummarizer` contracts.
+Freeze `Transcriber`, `Chunker`, `DocumentEmbedder`, `QueryEmbedder`, and `GroundedSummarizer` contracts.
 
 **AC**
 - timestamps are milliseconds;
@@ -102,7 +102,7 @@ Convert timestamped transcript to embedding-ready chunks.
 - document/query embedding space is identical.
 
 ## RES-12 Persist indexing result — Backend + AI — 5 SP
-Wire real indexer into worker and store chunks.
+Wire the transcription, chunking, and embedding pipeline into the worker and store chunks.
 
 **AC**
 - complete result committed atomically;
