@@ -10,7 +10,8 @@ from app.ai.contracts import (
     Transcriber,
 )
 from app.ai.embeddings import SentenceTransformerEmbedder
-from app.ai.stubs import StubAudioIndexer, StubGroundedSummarizer
+from app.ai.ollama import OllamaGroundedSummarizer
+from app.ai.stubs import StubAudioIndexer
 from app.ai.whisper import WhisperTranscriber
 
 
@@ -40,4 +41,4 @@ def get_query_embedder() -> QueryEmbedder:
 
 
 def get_summarizer() -> GroundedSummarizer:
-    return StubGroundedSummarizer()
+    return OllamaGroundedSummarizer()

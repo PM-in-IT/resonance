@@ -29,9 +29,13 @@ class Settings(BaseSettings):
     max_upload_bytes: int = 100 * 1024 * 1024
     max_media_duration_seconds: int = 600
 
-    embedding_dimension: int = 0
+    embedding_dimension: int = 384
     sentence_transformer_model: str = "sentence-transformers/all-MiniLM-L6-v2"
     sentence_transformer_device: str = "cpu"
+
+    ollama_base_url: str = "http://localhost:11434"
+    ollama_model: str = "qwen2.5:3b"
+    ollama_request_timeout_seconds: float = 180.0
 
     whisper_model: str = "small"
     whisper_device: str = "cpu"

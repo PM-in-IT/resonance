@@ -24,3 +24,4 @@ docker compose exec api alembic upgrade head
 
 - API: `http://localhost:8000`
 - OpenAPI: `http://localhost:8000/docs`
+- Ollama: `http://localhost:11434`
