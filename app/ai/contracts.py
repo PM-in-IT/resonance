@@ -5,15 +5,6 @@ from typing import Protocol
 
 
 @dataclass(frozen=True, slots=True)
-class IndexedChunk:
-    ordinal: int
-    start_ms: int
-    end_ms: int
-    text: str
-    embedding: list[float]
-
-
-@dataclass(frozen=True, slots=True)
 class GroundingChunk:
     start_ms: int
     end_ms: int
@@ -42,12 +33,6 @@ class Chunker(Protocol):
 class DocumentEmbedder(Protocol):
     def embed_documents(self, texts: Sequence[str]) -> list[list[float]]:
         """Encode transcript text for vector storage."""
-        ...
-
-
-class AudioIndexer(Protocol):
-    def index(self, audio_path: Path) -> Sequence[IndexedChunk]:
-        """Transcribe, timestamp, chunk and embed a media file."""
         ...
 
 

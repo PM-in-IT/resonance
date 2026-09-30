@@ -2,7 +2,6 @@ from functools import lru_cache
 
 from app.ai.chunking import TranscriptChunker
 from app.ai.contracts import (
-    AudioIndexer,
     Chunker,
     DocumentEmbedder,
     GroundedSummarizer,
@@ -10,12 +9,8 @@ from app.ai.contracts import (
     Transcriber,
 )
 from app.ai.embeddings import SentenceTransformerEmbedder
-from app.ai.stubs import StubAudioIndexer, StubGroundedSummarizer
+from app.ai.ollama import OllamaGroundedSummarizer
 from app.ai.whisper import WhisperTranscriber
-
-
-def get_audio_indexer() -> AudioIndexer:
-    return StubAudioIndexer()
 
 
 def get_transcriber() -> Transcriber:
@@ -40,4 +35,4 @@ def get_query_embedder() -> QueryEmbedder:
 
 
 def get_summarizer() -> GroundedSummarizer:
-    return StubGroundedSummarizer()
+    return OllamaGroundedSummarizer()
