@@ -108,6 +108,64 @@
             <button class="reset-button" id="reset-upload" type="button" hidden>Upload another recording <span aria-hidden="true">↗</span></button>
           </aside>
         </div>
+
+        <section class="question-section" id="question-section" aria-labelledby="question-title" hidden>
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">ASK THE RECORDING</p>
+              <h2 id="question-title">What would you like to know?</h2>
+            </div>
+            <span class="step-index">02 <span>/ 02</span></span>
+          </div>
+
+          <div class="question-layout">
+            <form class="question-form" id="question-form">
+              <label class="field-label" for="question-input">YOUR QUESTION</label>
+              <textarea id="question-input" name="question" rows="4" maxlength="2000" placeholder="Ask about an idea, detail, or moment in the recording." required></textarea>
+              <div class="question-controls">
+                <label class="top-k-control" for="top-k-select">
+                  <span>EXCERPTS</span>
+                  <select id="top-k-select" name="top_k">
+                    <option value="3">3</option>
+                    <option value="5" selected>5</option>
+                    <option value="8">8</option>
+                    <option value="10">10</option>
+                  </select>
+                </label>
+                <button class="ask-button" id="ask-button" type="submit" disabled>
+                  <span>Ask question</span>
+                  <span aria-hidden="true">↗</span>
+                </button>
+              </div>
+              <p class="query-error" id="query-error" role="alert" hidden></p>
+            </form>
+
+            <div class="answer-column">
+              <div class="answer-empty" id="answer-empty">
+                <span class="answer-mark" aria-hidden="true">?</span>
+                <p>Your answer and matching transcript excerpts will appear here.</p>
+              </div>
+              <section class="answer-view" id="answer-view" aria-live="polite" aria-busy="false" hidden>
+                <div class="answer-heading">
+                  <p class="eyebrow">GROUNDED ANSWER</p>
+                  <span class="answer-time" id="answer-time"></span>
+                </div>
+                <p class="answer-summary" id="answer-summary"></p>
+                <div class="generation-state" id="generation-state" role="status" hidden>
+                  <span class="generation-pulse" aria-hidden="true"><i></i><i></i><i></i></span>
+                  <span>Retrieving transcript excerpts and generating an answer</span>
+                </div>
+                <div class="match-section">
+                  <div class="match-heading">
+                    <h3>Supporting excerpts</h3>
+                    <span id="match-count"></span>
+                  </div>
+                  <ol class="match-list" id="match-list"></ol>
+                </div>
+              </section>
+            </div>
+          </div>
+        </section>
       </main>
 
       <footer class="page-footer">

@@ -18,5 +18,7 @@ def test_upload_page_and_static_assets_are_served() -> None:
 
     assert page.status_code == 200
     assert "Audio intake" in page.text
+    assert "What would you like to know?" in page.text
+    assert "Retrieving transcript excerpts and generating an answer" in page.text
     assert stylesheet.status_code == 200
     assert script.status_code == 200
