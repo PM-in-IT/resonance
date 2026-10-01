@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#eef1e9">
+    <title>Audio intake | Resonance</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/styles.css">
+    <script src="/static/app.js" defer></script>
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="topbar">
+        <a class="brand" href="/" aria-label="Resonance home">
+          <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span>resonance</span>
+        </a>
+        <div class="topbar-right">
+          <span class="environment"><span class="live-dot"></span> LOCAL WORKSPACE</span>
+          <a class="docs-link" href="/docs" target="_blank" rel="noreferrer">API docs <span aria-hidden="true">↗</span></a>
+        </div>
+      </header>
+
+      <main>
+        <div class="page-heading">
+          <p class="eyebrow">MEDIA / INTAKE <span>01</span></p>
+          <h1>Audio intake</h1>
+          <p class="lede">Add a recording to start transcription and indexing.</p>
+        </div>
+
+        <div class="workspace-grid">
+          <section class="upload-section" aria-labelledby="upload-title">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">NEW RECORDING</p>
+                <h2 id="upload-title">Upload audio</h2>
+              </div>
+              <span class="step-index">01 <span>/ 02</span></span>
+            </div>
+
+            <form id="upload-form">
+              <input id="file-input" name="file" type="file" accept="audio/*" hidden>
+              <div class="dropzone" id="dropzone" aria-label="Audio file drop area">
+                <div class="dropzone-art" aria-hidden="true">
+                  <span class="upload-arrow"></span>
+                  <span class="upload-base"></span>
+                </div>
+                <p class="drop-title">Drop an audio file here</p>
+                <p class="drop-subtitle">or <button class="text-button" id="choose-file" type="button">browse files</button></p>
+                <p class="file-hint">Your recording will be processed in the background.</p>
+              </div>
+
+              <div class="selected-file" id="selected-file" hidden>
+                <div class="file-symbol" aria-hidden="true">WAV</div>
+                <div class="file-copy">
+                  <span class="file-name" id="file-name"></span>
+                  <span class="file-size" id="file-size"></span>
+                </div>
+                <button class="remove-file" id="remove-file" type="button" aria-label="Remove selected file" title="Remove selected file">×</button>
+              </div>
+
+              <audio id="audio-preview" controls hidden></audio>
+
+              <button class="upload-button" id="upload-button" type="submit" disabled>
+                <span>Upload recording</span>
+                <span class="button-arrow" aria-hidden="true">↗</span>
+              </button>
+            </form>
+
+            <p class="upload-error" id="upload-error" role="alert" hidden></p>
+          </section>
+
+          <aside class="status-panel" aria-labelledby="status-heading" aria-live="polite">
+            <div class="status-topline">
+              <span class="eyebrow">PROCESSING STATUS</span>
+              <span class="status-pill" id="status-pill" data-status="idle">STANDBY</span>
+            </div>
+
+            <div class="waveform" id="waveform" aria-hidden="true"></div>
+
+            <div class="status-message">
+              <h2 id="status-heading">Waiting for audio</h2>
+              <p id="status-copy">The upload and processing state will appear here.</p>
+            </div>
+
+            <div class="progress-track" id="progress-track" hidden>
+              <span id="progress-fill"></span>
+            </div>
+
+            <dl class="asset-details">
+              <div>
+                <dt>ASSET ID</dt>
+                <dd id="asset-id">Not assigned</dd>
+              </div>
+              <div>
+                <dt>FILE</dt>
+                <dd id="asset-name">No file selected</dd>
+              </div>
+              <div>
+                <dt>DURATION</dt>
+                <dd id="asset-duration">--:--</dd>
+              </div>
+            </dl>
+
+            <button class="reset-button" id="reset-upload" type="button" hidden>Upload another recording <span aria-hidden="true">↗</span></button>
+          </aside>
+        </div>
+      </main>
+
+      <footer class="page-footer">
+        <span>RESONANCE <span class="footer-divider">/</span> AUDIO WORKSPACE</span>
+        <span>LOCAL DEVELOPMENT</span>
+      </footer>
+    </div>
+  </body>
+</html>
