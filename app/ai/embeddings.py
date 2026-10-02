@@ -12,7 +12,7 @@ class SentenceTransformerEmbedder:
         model_name: str = settings.sentence_transformer_model,
         device: str = settings.sentence_transformer_device,
     ) -> None:
-        from sentence_transformers import SentenceTransformer  
+        from sentence_transformers import SentenceTransformer
 
         self._model = SentenceTransformer(model_name, device=device)
 
