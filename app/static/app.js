@@ -15,6 +15,7 @@ const resetButton = document.querySelector("#reset-upload");
 const questionSection = document.querySelector("#question-section");
 const questionForm = document.querySelector("#question-form");
 const questionInput = document.querySelector("#question-input");
+const starterQueryButtons = document.querySelectorAll(".starter-chip");
 const askButton = document.querySelector("#ask-button");
 const queryError = document.querySelector("#query-error");
 const answerEmpty = document.querySelector("#answer-empty");
@@ -70,6 +71,9 @@ function setState(state, copy = "") {
   resetButton.hidden = !["ready", "failed"].includes(state);
   questionSection.hidden = state !== "ready";
   questionInput.disabled = state !== "ready" || queryPending;
+  starterQueryButtons.forEach((button) => {
+    button.disabled = state !== "ready" || queryPending;
+  });
   askButton.disabled = state !== "ready" || queryPending;
 }
 
@@ -316,6 +320,15 @@ questionForm.addEventListener("submit", async (event) => {
     askButton.firstElementChild.textContent = "Ask question";
     setState("ready");
   }
+});
+
+starterQueryButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    questionInput.value = button.dataset.question;
+    queryError.textContent = "";
+    queryError.hidden = true;
+    questionInput.focus();
+  });
 });
 
 resetButton.addEventListener("click", () => {
