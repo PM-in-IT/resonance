@@ -122,6 +122,16 @@
             <form class="question-form" id="question-form">
               <label class="field-label" for="question-input">YOUR QUESTION</label>
               <textarea id="question-input" name="question" rows="4" maxlength="2000" placeholder="Ask about an idea, detail, or moment in the recording." required></textarea>
+              <div class="starter-queries" role="group" aria-label="Starter questions">
+                <p class="starter-label">TRY A QUESTION</p>
+                <div class="starter-chip-list">
+                  <button class="starter-chip" type="button" data-question="What are the main topics and key points discussed in this recording?">Topics and key points</button>
+                  <button class="starter-chip" type="button" data-question="What action items, next steps, or future plans were mentioned?">Action items and plans</button>
+                  <button class="starter-chip" type="button" data-question="What decisions, agreements, or final conclusions were reached?">Decisions and conclusions</button>
+                  <button class="starter-chip" type="button" data-question="What important questions, concerns, or unresolved issues were raised?">Questions and open issues</button>
+                  <button class="starter-chip" type="button" data-question="What were the most significant statements or emphasized points made?">Significant statements</button>
+                </div>
+              </div>
               <div class="question-controls">
                 <label class="top-k-control" for="top-k-select">
                   <span>EXCERPTS</span>
