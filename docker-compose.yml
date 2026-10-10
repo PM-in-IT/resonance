@@ -1,11 +1,21 @@
 services:
   api:
     build: .
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
-    env_file: .env
+    command:
+      - uvicorn
+      - app.main:app
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8000"
+      - --reload
+    env_file:
+      - .env
     environment:
+      DATABASE_URL: postgresql+psycopg://resonance:resonance@postgres:5432/resonance
+      REDIS_URL: redis://redis:6379/0
+      LOCAL_STORAGE_PATH: /data/uploads
       OLLAMA_BASE_URL: http://ollama:11434
-      OLLAMA_MODEL: ${OLLAMA_MODEL:-qwen2.5:3b}
     volumes:
       - .:/app
       - resonance-data:/data
@@ -13,24 +23,35 @@ services:
       - "8000:8000"
     depends_on:
       postgres:
-        condition: service_started
+        condition: service_healthy
       redis:
-        condition: service_started
+        condition: service_healthy
       ollama-model-init:
         condition: service_completed_successfully
 
   worker:
     build: .
-    command: rq worker media --url redis://redis:6379/0
-    env_file: .env
+    command:
+      - rq
+      - worker
+      - ${RQ_QUEUE_NAME:-media}
+      - --url
+      - redis://redis:6379/0
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://resonance:resonance@postgres:5432/resonance
+      REDIS_URL: redis://redis:6379/0
+      LOCAL_STORAGE_PATH: /data/uploads
+      OLLAMA_BASE_URL: http://ollama:11434
     volumes:
       - .:/app
       - resonance-data:/data
     depends_on:
       postgres:
-        condition: service_started
+        condition: service_healthy
       redis:
-        condition: service_started
+        condition: service_healthy
       ollama-model-init:
         condition: service_completed_successfully
 
@@ -44,11 +65,28 @@ services:
       - "5432:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U resonance -d resonance
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
 
   redis:
     image: redis:7-alpine
     ports:
       - "6379:6379"
+    healthcheck:
+      test:
+        - CMD
+        - redis-cli
+        - ping
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 2s
 
   ollama:
     image: ollama/ollama:latest
@@ -58,6 +96,14 @@ services:
       - "11434:11434"
     volumes:
       - ollama-data:/root/.ollama
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - ollama list >/dev/null 2>&1 || exit 1
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 5s
 
   ollama-model-init:
     image: ollama/ollama:latest
@@ -72,10 +118,11 @@ services:
         until ollama list >/dev/null 2>&1; do
           sleep 2
         done
+
         ollama pull "$OLLAMA_MODEL"
     depends_on:
       ollama:
-        condition: service_started
+        condition: service_healthy
     volumes:
       - ollama-data:/root/.ollama
 
