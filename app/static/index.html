@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#eef1e9">
+    <title>Audio intake | Resonance</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/styles.css">
+    <script src="/static/app.js" defer></script>
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="topbar">
+        <a class="brand" href="/" aria-label="Resonance home">
+          <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span>resonance</span>
+        </a>
+        <div class="topbar-right">
+          <span class="environment"><span class="live-dot"></span> LOCAL WORKSPACE</span>
+          <a class="docs-link" href="/docs" target="_blank" rel="noreferrer">API docs <span aria-hidden="true">↗</span></a>
+        </div>
+      </header>
+
+      <main>
+        <div class="page-heading">
+          <p class="eyebrow">MEDIA / INTAKE <span>01</span></p>
+          <h1>Audio intake</h1>
+          <p class="lede">Add a recording to start transcription and indexing.</p>
+        </div>
+
+        <div class="workspace-grid">
+          <section class="upload-section" aria-labelledby="upload-title">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">NEW RECORDING</p>
+                <h2 id="upload-title">Upload audio</h2>
+              </div>
+              <span class="step-index">01 <span>/ 02</span></span>
+            </div>
+
+            <form id="upload-form">
+              <input id="file-input" name="file" type="file" accept="audio/*" hidden>
+              <div class="dropzone" id="dropzone" aria-label="Audio file drop area">
+                <div class="dropzone-art" aria-hidden="true">
+                  <span class="upload-arrow"></span>
+                  <span class="upload-base"></span>
+                </div>
+                <p class="drop-title">Drop an audio file here</p>
+                <p class="drop-subtitle">or <button class="text-button" id="choose-file" type="button">browse files</button></p>
+                <p class="file-hint">Your recording will be processed in the background.</p>
+              </div>
+
+              <div class="selected-file" id="selected-file" hidden>
+                <div class="file-symbol" aria-hidden="true">WAV</div>
+                <div class="file-copy">
+                  <span class="file-name" id="file-name"></span>
+                  <span class="file-size" id="file-size"></span>
+                </div>
+                <button class="remove-file" id="remove-file" type="button" aria-label="Remove selected file" title="Remove selected file">×</button>
+              </div>
+
+              <audio id="audio-preview" controls hidden></audio>
+
+              <button class="upload-button" id="upload-button" type="submit" disabled>
+                <span>Upload recording</span>
+                <span class="button-arrow" aria-hidden="true">↗</span>
+              </button>
+            </form>
+
+            <p class="upload-error" id="upload-error" role="alert" hidden></p>
+          </section>
+
+          <aside class="status-panel" aria-labelledby="status-heading" aria-live="polite">
+            <div class="status-topline">
+              <span class="eyebrow">PROCESSING STATUS</span>
+              <span class="status-pill" id="status-pill" data-status="idle">STANDBY</span>
+            </div>
+
+            <div class="waveform" id="waveform" aria-hidden="true"></div>
+
+            <div class="status-message">
+              <h2 id="status-heading">Waiting for audio</h2>
+              <p id="status-copy">The upload and processing state will appear here.</p>
+            </div>
+
+            <div class="progress-track" id="progress-track" hidden>
+              <span id="progress-fill"></span>
+            </div>
+
+            <dl class="asset-details">
+              <div>
+                <dt>ASSET ID</dt>
+                <dd id="asset-id">Not assigned</dd>
+              </div>
+              <div>
+                <dt>FILE</dt>
+                <dd id="asset-name">No file selected</dd>
+              </div>
+              <div>
+                <dt>DURATION</dt>
+                <dd id="asset-duration">--:--</dd>
+              </div>
+            </dl>
+
+            <button class="reset-button" id="reset-upload" type="button" hidden>Upload another recording <span aria-hidden="true">↗</span></button>
+          </aside>
+        </div>
+
+        <section class="question-section" id="question-section" aria-labelledby="question-title" hidden>
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">ASK THE RECORDING</p>
+              <h2 id="question-title">What would you like to know?</h2>
+            </div>
+            <span class="step-index">02 <span>/ 02</span></span>
+          </div>
+
+          <div class="question-layout">
+            <form class="question-form" id="question-form">
+              <label class="field-label" for="question-input">YOUR QUESTION</label>
+              <textarea id="question-input" name="question" rows="4" maxlength="2000" placeholder="Ask about an idea, detail, or moment in the recording." required></textarea>
+              <div class="starter-queries" role="group" aria-label="Starter questions">
+                <p class="starter-label">TRY A QUESTION</p>
+                <div class="starter-chip-list">
+                  <button class="starter-chip" type="button" data-question="What are the main topics and key points discussed in this recording?">Topics and key points</button>
+                  <button class="starter-chip" type="button" data-question="What action items, next steps, or future plans were mentioned?">Action items and plans</button>
+                  <button class="starter-chip" type="button" data-question="What decisions, agreements, or final conclusions were reached?">Decisions and conclusions</button>
+                  <button class="starter-chip" type="button" data-question="What important questions, concerns, or unresolved issues were raised?">Questions and open issues</button>
+                  <button class="starter-chip" type="button" data-question="What were the most significant statements or emphasized points made?">Significant statements</button>
+                </div>
+              </div>
+              <div class="question-controls">
+                <label class="top-k-control" for="top-k-select">
+                  <span>EXCERPTS</span>
+                  <select id="top-k-select" name="top_k">
+                    <option value="3">3</option>
+                    <option value="5" selected>5</option>
+                    <option value="8">8</option>
+                    <option value="10">10</option>
+                  </select>
+                </label>
+                <button class="ask-button" id="ask-button" type="submit" disabled>
+                  <span>Ask question</span>
+                  <span aria-hidden="true">↗</span>
+                </button>
+              </div>
+              <p class="query-error" id="query-error" role="alert" hidden></p>
+            </form>
+
+            <div class="answer-column">
+              <div class="answer-empty" id="answer-empty">
+                <span class="answer-mark" aria-hidden="true">?</span>
+                <p>Your answer and matching transcript excerpts will appear here.</p>
+              </div>
+              <section class="answer-view" id="answer-view" aria-live="polite" aria-busy="false" hidden>
+                <div class="answer-heading">
+                  <p class="eyebrow">GROUNDED ANSWER</p>
+                  <span class="answer-time" id="answer-time"></span>
+                </div>
+                <p class="answer-summary" id="answer-summary"></p>
+                <div class="generation-state" id="generation-state" role="status" hidden>
+                  <span class="generation-pulse" aria-hidden="true"><i></i><i></i><i></i></span>
+                  <span>Retrieving transcript excerpts and generating an answer</span>
+                </div>
+                <div class="match-section">
+                  <div class="match-heading">
+                    <h3>Supporting excerpts</h3>
+                    <span id="match-count"></span>
+                  </div>
+                  <ol class="match-list" id="match-list"></ol>
+                </div>
+              </section>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="page-footer">
+        <span>RESONANCE <span class="footer-divider">/</span> AUDIO WORKSPACE</span>
+        <span>LOCAL DEVELOPMENT</span>
+      </footer>
+    </div>
+  </body>
+</html>
