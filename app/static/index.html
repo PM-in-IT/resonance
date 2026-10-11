@@ -109,6 +109,19 @@
           </aside>
         </div>
 
+        <section class="audio-history" aria-labelledby="history-title">
+          <div class="history-heading">
+            <div>
+              <p class="eyebrow">LIBRARY</p>
+              <h2 id="history-title">Your recordings <span id="history-count"></span></h2>
+            </div>
+            <button class="history-refresh" id="history-refresh" type="button">Refresh</button>
+          </div>
+          <p class="history-message" id="history-message" role="status">Loading recordings...</p>
+          <ul class="history-list" id="history-list" aria-label="Uploaded audio history"></ul>
+          <button class="history-more" id="history-more" type="button" hidden>Load older recordings</button>
+        </section>
+
         <section class="question-section" id="question-section" aria-labelledby="question-title" hidden>
           <div class="section-heading">
             <div>
