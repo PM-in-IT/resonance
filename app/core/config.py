@@ -34,7 +34,7 @@ class Settings(BaseSettings):
     sentence_transformer_device: str = "cpu"
 
     ollama_base_url: str = "http://localhost:11434"
-    ollama_model: str = "qwen2.5:3b"
+    ollama_model: str = "llama3.2:3b"
     ollama_request_timeout_seconds: float = 180.0
 
     whisper_model: str = "small"
