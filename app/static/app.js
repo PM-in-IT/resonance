@@ -12,6 +12,11 @@ const statusCopy = document.querySelector("#status-copy");
 const progressTrack = document.querySelector("#progress-track");
 const progressFill = document.querySelector("#progress-fill");
 const resetButton = document.querySelector("#reset-upload");
+const historyList = document.querySelector("#history-list");
+const historyCount = document.querySelector("#history-count");
+const historyMessage = document.querySelector("#history-message");
+const historyRefreshButton = document.querySelector("#history-refresh");
+const historyMoreButton = document.querySelector("#history-more");
 const questionSection = document.querySelector("#question-section");
 const questionForm = document.querySelector("#question-form");
 const questionInput = document.querySelector("#question-input");
@@ -25,11 +30,16 @@ const generationState = document.querySelector("#generation-state");
 const answerTime = document.querySelector("#answer-time");
 const matchList = document.querySelector("#match-list");
 const bytesInMegabyte = 1024 * 1024;
+const historyPageSize = 20;
 let currentFile = null;
 let previewUrl = null;
 let pollTimer = null;
 let activeAudioId = localStorage.getItem("resonance:lastAudioId");
 let queryPending = false;
+let audioHistory = [];
+let historyOffset = 0;
+let historyHasMore = false;
+let historyLoading = false;
 
 const messages = {
   queued: ["In the queue", "The worker will begin processing this recording shortly."],
@@ -48,6 +58,133 @@ function formatDuration(milliseconds) {
   const seconds = Math.floor(milliseconds / 1000);
   const minutesPart = Math.floor(seconds / 60);
   return `${String(minutesPart).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
+}
+
+function formatCreatedAt(timestamp) {
+  const date = new Date(timestamp);
+  if (Number.isNaN(date.getTime())) return "Date unavailable";
+  return date.toLocaleString(undefined, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
+function renderAudioHistory() {
+  historyList.replaceChildren();
+  historyCount.textContent = audioHistory.length ? `${audioHistory.length} loaded` : "";
+  historyMessage.hidden = audioHistory.length > 0;
+
+  for (const asset of audioHistory) {
+    const item = document.createElement("li");
+    item.className = "history-item";
+    item.dataset.audioId = asset.id;
+
+    const details = document.createElement("div");
+    details.className = "history-file-details";
+    const name = document.createElement("span");
+    name.className = "history-file-name";
+    name.textContent = asset.original_filename;
+    const metadata = document.createElement("span");
+    metadata.className = "history-file-meta";
+    metadata.textContent = `${formatCreatedAt(asset.created_at)}  /  ${formatDuration(asset.duration_ms)}`;
+    details.append(name, metadata);
+
+    const status = document.createElement("span");
+    status.className = "history-status status-pill";
+    status.dataset.status = asset.status;
+    status.textContent = asset.status.toUpperCase();
+
+    const select = document.createElement("button");
+    select.className = "history-select";
+    select.type = "button";
+    select.setAttribute("aria-pressed", String(asset.id === activeAudioId));
+    select.textContent = asset.id === activeAudioId ? "Selected" : "Open";
+    select.addEventListener("click", () => selectHistoryAudio(asset));
+
+    item.append(details, status, select);
+    historyList.append(item);
+  }
+
+  historyMoreButton.hidden = !historyHasMore;
+}
+
+async function loadAudioHistory(reset = true) {
+  if (historyLoading) return;
+  historyLoading = true;
+  historyRefreshButton.disabled = true;
+  historyMoreButton.disabled = true;
+  if (reset) {
+    historyOffset = 0;
+    historyHasMore = false;
+    if (!audioHistory.length) {
+      historyMessage.textContent = "Loading recordings...";
+      historyMessage.hidden = false;
+    }
+  }
+
+  try {
+    const response = await fetch(
+      `/api/v1/audio?limit=${historyPageSize}&offset=${historyOffset}`,
+    );
+    if (!response.ok) throw new Error("Could not load audio history.");
+    const page = await response.json();
+    audioHistory = reset ? page : [...audioHistory, ...page];
+    historyOffset += page.length;
+    historyHasMore = page.length === historyPageSize;
+    historyMessage.textContent = audioHistory.length
+      ? ""
+      : "No recordings yet. Upload an audio file to get started.";
+    renderAudioHistory();
+  } catch (error) {
+    historyMessage.textContent = error.message || "Could not load audio history.";
+    historyMessage.hidden = false;
+  } finally {
+    historyLoading = false;
+    historyRefreshButton.disabled = false;
+    historyMoreButton.disabled = false;
+  }
+}
+
+function addOrUpdateHistoryAsset(asset) {
+  const index = audioHistory.findIndex((item) => item.id === asset.id);
+  if (index === -1) {
+    audioHistory.unshift(asset);
+    if (audioHistory.length > historyPageSize) audioHistory.pop();
+    historyOffset = audioHistory.length;
+    historyHasMore = historyHasMore || audioHistory.length === historyPageSize;
+    renderAudioHistory();
+    return;
+  }
+
+  audioHistory[index] = asset;
+  const row = Array.from(historyList.children).find(
+    (item) => item.dataset.audioId === asset.id,
+  );
+  if (!row) return;
+  const status = row.querySelector(".history-status");
+  status.dataset.status = asset.status;
+  status.textContent = asset.status.toUpperCase();
+  const select = row.querySelector(".history-select");
+  select.setAttribute("aria-pressed", String(asset.id === activeAudioId));
+  select.textContent = asset.id === activeAudioId ? "Selected" : "Open";
+}
+
+function selectHistoryAudio(asset) {
+  window.clearTimeout(pollTimer);
+  activeAudioId = asset.id;
+  localStorage.setItem("resonance:lastAudioId", asset.id);
+  clearAnswer();
+  clearSelectedFile();
+  clearError();
+  document.querySelector("#asset-id").textContent = asset.id;
+  document.querySelector("#asset-name").textContent = asset.original_filename;
+  document.querySelector("#asset-duration").textContent = formatDuration(asset.duration_ms);
+  setState(asset.status, asset.failure_message || "");
+  renderAudioHistory();
+  if (["queued", "processing"].includes(asset.status)) pollAudio(asset.id);
 }
 
 function showError(message) {
@@ -138,6 +275,7 @@ function chooseFile(file) {
   clearAnswer();
   activeAudioId = null;
   localStorage.removeItem("resonance:lastAudioId");
+  renderAudioHistory();
   window.clearTimeout(pollTimer);
   selectedFile.hidden = false;
   document.querySelector("#file-name").textContent = file.name;
@@ -221,6 +359,7 @@ function uploadAudio(file) {
     document.querySelector("#asset-duration").textContent = formatDuration(result.duration_ms);
     activeAudioId = result.id;
     localStorage.setItem("resonance:lastAudioId", result.id);
+    addOrUpdateHistoryAsset(result);
     progressTrack.hidden = true;
     setState(result.status, "Upload accepted. Waiting for the worker.");
     pollAudio(result.id);
@@ -239,11 +378,13 @@ async function pollAudio(audioId) {
   try {
     const response = await fetch(`/api/v1/audio/${encodeURIComponent(audioId)}`);
     const asset = await response.json();
+    if (audioId !== activeAudioId) return;
     if (!response.ok) throw new Error(asset.detail?.message || asset.detail || "Could not read audio status.");
 
     document.querySelector("#asset-id").textContent = asset.id;
     document.querySelector("#asset-name").textContent = asset.original_filename;
     document.querySelector("#asset-duration").textContent = formatDuration(asset.duration_ms);
+    addOrUpdateHistoryAsset(asset);
     setState(asset.status, asset.failure_message || "");
 
     if (["queued", "processing"].includes(asset.status)) {
@@ -252,6 +393,7 @@ async function pollAudio(audioId) {
       showError(asset.failure_message || "Audio processing failed.");
     }
   } catch (error) {
+    if (audioId !== activeAudioId) return;
     setState("processing", "Status check failed temporarily. Retrying shortly.");
     pollTimer = window.setTimeout(() => pollAudio(audioId), 5000);
   }
@@ -340,10 +482,15 @@ resetButton.addEventListener("click", () => {
   clearError();
   progressTrack.hidden = true;
   document.querySelector("#asset-id").textContent = "Not assigned";
+  renderAudioHistory();
   setState("idle");
 });
 
+historyRefreshButton.addEventListener("click", () => loadAudioHistory());
+historyMoreButton.addEventListener("click", () => loadAudioHistory(false));
+
 makeWaveform();
+loadAudioHistory();
 const previousAudioId = activeAudioId;
 if (previousAudioId) {
   document.querySelector("#asset-id").textContent = previousAudioId;

@@ -21,7 +21,7 @@ def test_summarizer_sends_question_and_timestamped_excerpts(monkeypatch) -> None
     monkeypatch.setattr("app.ai.ollama.httpx.post", fake_post)
     summarizer = OllamaGroundedSummarizer(
         base_url="http://ollama:11434/",
-        model="qwen2.5:3b",
+        model="llama3.2:3b",
         timeout_seconds=90,
     )
 
@@ -35,7 +35,7 @@ def test_summarizer_sends_question_and_timestamped_excerpts(monkeypatch) -> None
     assert captured["timeout"] == 90
     payload = captured["json"]
     assert isinstance(payload, dict)
-    assert payload["model"] == "qwen2.5:3b"
+    assert payload["model"] == "llama3.2:3b"
     messages = payload["messages"]
     assert isinstance(messages, list)
     assert messages[1]["content"] == (

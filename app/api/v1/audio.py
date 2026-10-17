@@ -6,6 +6,7 @@ from fastapi import (
     Depends,
     File,
     HTTPException,
+    Query,
     UploadFile,
     status,
 )
@@ -75,6 +76,26 @@ def upload_audio(
         ) from exc
 
     return AudioAssetResponse.model_validate(asset)
+
+
+@router.get(
+    "",
+    response_model=list[AudioAssetResponse],
+)
+def list_audio(
+    db: Annotated[Session, Depends(get_db)],
+    limit: Annotated[int, Query(ge=1, le=100)] = 50,
+    offset: Annotated[int, Query(ge=0)] = 0,
+) -> list[AudioAssetResponse]:
+    assets = AudioRepository(db).list_recent(
+        limit=limit,
+        offset=offset,
+    )
+
+    return [
+        AudioAssetResponse.model_validate(asset)
+        for asset in assets
+    ]
 
 
 @router.get(
